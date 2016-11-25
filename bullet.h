@@ -40,8 +40,10 @@ public:
         bullet_v.x = SPEED*sin(angle_hudu);
         bullet_v.y = -SPEED*cos(angle_hudu);
     }
-	void reverse_dx();
-	void reverse_dy();
+	void reverse_dx_left();
+    void reverse_dx_right();
+    void reverse_dy_up();
+    void reverse_dy_down();
 	void bullet_collision_check(Bullet *bullet);
 	void horizontal_collide();
 	void vertical_collide();

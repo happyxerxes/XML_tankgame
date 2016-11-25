@@ -1,5 +1,5 @@
 #include "bullet.h"
-#include <iostream>
+
 #define left_side 5
 #define right_side 795
 #define up_side 5
@@ -16,8 +16,10 @@ bullet.vy = vy;
 bullet_shape.setPosition(x, y);
 
 }*/
-void Bullet::reverse_dx() { bullet_v.x = -bullet_v.x; };
-void Bullet::reverse_dy() { bullet_v.y = -bullet_v.y; };
+void Bullet::reverse_dx_left() { bullet_v.x = -abs((int)bullet_v.x); };
+void Bullet::reverse_dx_right() { bullet_v.x = abs((int)bullet_v.x); };
+void Bullet::reverse_dy_up() { bullet_v.y = abs((int)bullet_v.y); };
+void Bullet::reverse_dy_down() { bullet_v.y = -abs((int)bullet_v.y); };
 
 void Bullet::horizontal_collide() {
 	horizontal_collision = true;
