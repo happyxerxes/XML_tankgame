@@ -2,11 +2,15 @@
 #include "shield.h"
 
 
+
+
+
+
 Shield::Shield(unsigned int category) {
 	switch (category) {
 	case SHIELD_A:
 		//            ConvexShape(6);
-		setshape_A();
+        create_map_A();
 		break;
 	case SHIELD_B:
 		//            ConvexShape(8);
@@ -32,10 +36,10 @@ Shield::Shield(unsigned int category) {
 	}
 }
 
-void Shield::A_check_collsion_with_bullet(Bullet &bullet) {
+void Shield::check_collsion_with_bullet(Bullet &bullet, float position_x,float position_y) {
 	sf::Vector2f centre_A, bullet_position;
-	centre_A.x = a_position_x + 20;
-	centre_A.y = a_position_y + 20;
+	centre_A.x = position_x + 20;
+	centre_A.y = position_y + 20;
 
 	bullet_position = bullet.getPosition();
 
@@ -43,16 +47,22 @@ void Shield::A_check_collsion_with_bullet(Bullet &bullet) {
 	float y = bullet_position.y - centre_A.y;
 
 	if (x<35 && x>-35 && y<35 && y>-35) {
-		if ((y>x && y>-x) || (y<x && y<-x)) {
-			bullet.reverse_dy();
+		if (y>x && y>-x) {
+			bullet.reverse_dy_up();
 		}
-		else { bullet.reverse_dx(); }
+        else if (y<x && y<-x) {
+            bullet.reverse_dy_down();
+        }
+        else if (y<x && y>-x) {
+            bullet.reverse_dx_right();
+        }
+		else { bullet.reverse_dx_left(); }
 	}
 }
-void Shield::A_check_collsion_with_tank(Tank &tank) {
+void Shield::check_collsion_with_tank(Tank &tank, float position_x,float position_y) {
 	sf::Vector2f centre_A, bullet_position, tank_position;
-	centre_A.x = a_position_x + 25;
-	centre_A.y = a_position_y + 25;
+	centre_A.x = position_x + 25;
+	centre_A.y = position_y + 25;
 
 	tank_position = tank.getPosition();
 
@@ -64,29 +74,29 @@ void Shield::A_check_collsion_with_tank(Tank &tank) {
 		sf::Vector2f left_up_point, right_down_point, right_up_point, left_down_point;
 		float l = sqrt(TANK_WIDTH*TANK_WIDTH + TANK_HEIGHT*TANK_HEIGHT)*0.5;
 		sf::Vector2f p = tank.getPosition();
-		// ×óÉÏ
+		// â—ŠÃ›â€¦Å“
 		float angle = 3.1416*0.25 - tank.getRotation() TO_RADIAN;
 
 		left_up_point.x = p.x - l*sin(angle);
 		left_up_point.y = p.y - l*cos(angle);
 
-		//ÓÒÏÂ
+		//â€â€œÅ“Â¬
 
 		right_down_point.x = p.x + l*sin(angle);
 		right_down_point.y = p.y + l*cos(angle);
-		//ÓÒÉÏ
+		//â€â€œâ€¦Å“
 		angle = 3.1415926535*0.25 + tank.getRotation() TO_RADIAN;
 		right_up_point.x = p.x + l*sin(angle);
 		right_up_point.y = p.y - l*cos(angle);
 
 
 
-		//×óÏÂ
+		//â—ŠÃ›Å“Â¬
 		left_down_point.x = p.x - l*sin(angle);
 		left_down_point.y = p.y + l*cos(angle);
 
 
-		//Ç°ÃæÈ¡10¸öµã
+		//Â«âˆžâˆšÃŠÂ»Â°10âˆË†Âµâ€ž
 		float k = (right_up_point.y - left_up_point.y) / (right_up_point.x - left_up_point.x);
 		float dx = (right_up_point.x - left_up_point.x) / 9;
 		//        float x,y;
@@ -109,7 +119,7 @@ void Shield::A_check_collsion_with_tank(Tank &tank) {
 
 
 
-		//ºóÃæÈ¡10¸öµã
+		//âˆ«Ã›âˆšÃŠÂ»Â°10âˆË†Âµâ€ž
 		k = (right_down_point.y - left_down_point.y) / (right_down_point.x - left_down_point.x);
 		dx = (right_down_point.x - left_down_point.x) / 9;
 		//        float x,y;
@@ -137,26 +147,7 @@ void Shield::A_check_collsion_with_tank(Tank &tank) {
 	}
 
 }
-
-void Shield::setshape_A() {
-	//*
-
-	// set_block_counts(get_block_counts()+3);
-
-	this->setPointCount(4);
-	this->setPoint(0, sf::Vector2f(0, 0));
-	this->setPoint(1, sf::Vector2f(0, 50));
-	this->setPoint(2, sf::Vector2f(50, 50));
-	this->setPoint(3, sf::Vector2f(50, 0));
-
-
-
-	this->setOutlineThickness(5);
-	this->setOutlineColor(sf::Color::Red);
-	//   this->setFillColor(sf::Color::Red);
-	this->setPosition(a_position_x, a_position_y);
-
-}
+void Shield::create_map_A(){}
 
 void Shield::setshape_B() {
 
@@ -174,21 +165,7 @@ void Shield::setshape_B() {
 	add_centre(sf::Vector2f(200+75,200+75));
 	*/
 
-	this->setPointCount(8);
-	this->setPoint(0, sf::Vector2f(0, 0));
-	this->setPoint(1, sf::Vector2f(0, 150));
-	this->setPoint(2, sf::Vector2f(50, 150));
-	this->setPoint(3, sf::Vector2f(50, 100));
-	this->setPoint(4, sf::Vector2f(100, 100));
-	this->setPoint(5, sf::Vector2f(100, 50));
-	this->setPoint(6, sf::Vector2f(50, 50));
-	this->setPoint(7, sf::Vector2f(50, 0));
-
-
-	this->setFillColor(sf::Color::Red);
-	//   this->setOutlineThickness(3);
-	this->setPosition(600, 400);
-}
+	}
 /*
 void Shield::setshape_Cup(){
 

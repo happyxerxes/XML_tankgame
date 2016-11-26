@@ -16,63 +16,55 @@ void Game::Draw_Tank(Tank &tank, sf::Time elapsed, sf::RenderWindow &window)
 	window.draw(tank.gun);
 }
 
-Game::Game() {
-	sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "TANK");
+Game::Game(sf::RenderWindow &window) {
+//	sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "TANK");
 	sf::Clock clock;
-	sf::Clock clock1;
-	tanks[0] = new Tank();
+	sf::Clock enemy_fire_clock;
+    sf::Clock create_enemy_clock;
+	
+    
+    //create tanks
+    tanks[0] = new Tank();
+    
+      /*
 	Tank enemy_tank;
 	enemy_tank.setPosition(150, 150);
 	enemy_tank.gun.setPosition(350, 450);
-    
+    */
     
     sf::Event event;
     
     
     
+
     
-    sf::Texture startgame_texture;
-    if (!startgame_texture.loadFromFile("/Users/XHZ/Library/Developer/Xcode/DerivedData/XML_Tank-endjjnmbmexpiehiwzrtpzwayevi/Build/Products/Release/XML_Tank.app/Contents/Resources/gamestart.jpg")) {
+    sf::Texture shield_texture;
+    
+    if (!shield_texture.loadFromFile("/Users/XHZ/Library/Developer/Xcode/DerivedData/XML_Tank-endjjnmbmexpiehiwzrtpzwayevi/Build/Products/Release/XML_Tank.app/Contents/Resources/shield.jpg")) {
         return;
     }
-    sf::Sprite startgame_sprite(startgame_texture);
-    
-    
-    
-    window.draw(startgame_sprite);
-    window.display();
-    
-    bool flag = true;
-    
-    while (window.isOpen() && flag){
-        while (window.pollEvent(event))
-        {
-            is_exit(event, window);
-            
-            
-            if (event.type == sf::Event::MouseButtonPressed)
-            {
-                if (event.mouseButton.button == sf::Mouse::Left)
-                {
-                    flag = false;
-                    break;
-                }
-            }
-        }
-        
-    }
+    sf::Sprite map_sprite(shield_texture);
 
-    
-    
-
-	Shield shield_a(SHIELD_A);
+	Shield shield(SHIELD_A);
 	/*SYSTEMTIME sys;
 	GetLocalTime(&sys);
 	int fire_time = sys.wSecond;*/
-	sf::Time fire_time = clock1.restart();
+//	sf::Time fire_time = clock1.restart();
 //	sf::Event event;
 	while (window.isOpen())
 	{
+        for (int i=1; i < TANKS_NUMBER; i++) {
+            if (tanks[i] == NULL && create_enemy_clock.getElapsedTime().asSeconds() > 10) {
+                create_enemy_clock.restart();
+                tanks[i] = new Tank();
+                tanks[i]->setPosition(150, 150);
+                tanks[i]->gun.setPosition(350, 450);
+                
+                printf("1");
+            }
+            
+        }
+
 
 		while (window.pollEvent(event))
 		{
@@ -84,7 +76,7 @@ Game::Game() {
 			{
 				if (event.mouseButton.button == sf::Mouse::Left)
 				{
-					for (int i = 0; i < 10; i++) {
+					for (int i = 0; i < BULLETS_NUMBER; i++) {
 						if (bullets[i] == NULL) {
 							bullets[i] = new Bullet(tanks[0]->fire(window));
 							break;
@@ -94,48 +86,113 @@ Game::Game() {
 				}
 			}
 		}
-		sf::Time fire_gap = clock1.getElapsedTime();
-		sf::Vector2f vector = tanks[0]->getPosition() - enemy_tank.getPosition();
-		float distance = (sqrt(vector.x*vector.x + vector.y*vector.y));
-		if (distance<150)
-		{
-			float angle =enemy_tank.enemy_fire_angle(vector);
-			enemy_tank.gun.setRotation(angle);
-			if (fire_gap.asSeconds() > 1)
-			{
-				for (int i = 0; i < 10; i++) {
-					if (bullets[i] == NULL) {
-						bullets[i] = new Bullet(enemy_tank.enemy_fire2tank(*tanks[0]));
-						break;
-					}
-				}
-				fire_time = clock1.restart();
-			}	
-		}
-		enemy_tank.enemy_move();
+        
+		sf::Time fire_gap = enemy_fire_clock.getElapsedTime();
+        
+        for (int i=1; i < TANKS_NUMBER; i++) {
+            if (tanks[i] != NULL) {
+                
+                sf::Vector2f vector = tanks[0]->getPosition() - tanks[i]->getPosition();
+                float distance = (sqrt(vector.x*vector.x + vector.y*vector.y));
+                if (distance<150)
+                {
+                    float angle =tanks[i]->enemy_fire_angle(vector);
+                    tanks[i]->gun.setRotation(angle);
+                    if (fire_gap.asSeconds() > 1)
+                    {
+                        for (int j = 0; j < BULLETS_NUMBER; j++) {
+                            if (bullets[j] == NULL) {
+                                bullets[j] = new Bullet(tanks[i]->enemy_fire2tank(*tanks[0]));
+                                break;
+                            }
+                        }
+                        enemy_fire_clock.restart();
+                    }	
+                }
+                
+                
+                tanks[i]->enemy_move();
+            }
+            
+        }
+
+	
 		
 		window.clear(sf::Color(225, 225, 225));
+        
+        
+        //shield 生成
+        
+        for (int i = 1; i <= shield.shield_position_array[0][0]; i++) {
+            map_sprite.setPosition(shield.a_position_x+shield.shield_position_array[i][0], shield.a_position_y+shield.shield_position_array[i][1]);
+            window.draw(map_sprite);
+        }
 
-		window.draw(shield_a);
+        
+        
 		/*if (enemy_tank.is_exist == true)
 		{
 			window.draw(enemy_tank);
 			window.draw(enemy_tank.gun);
 		}*/
-		window.draw(enemy_tank);
-		window.draw(enemy_tank.gun);
-		sf::Time elapsed = clock.restart();
-		Draw_Tank(*tanks[0], elapsed, window);
-		tanks[0]->tank_collison(enemy_tank);//坦克碰撞
-		enemy_tank.enemy_update(elapsed, window);
-		//check_collsion
-		for (int i = 0; i<10; i++) {
-			if (bullets[i] != NULL) {
-				shield_a.A_check_collsion_with_bullet(*bullets[i]);
-				tanks[0]->bullet_collision(*bullets[i]);
-				enemy_tank.bullet_collision(*bullets[i]);
+        
+        
+        for (int i=1; i < TANKS_NUMBER; i++) {
+            if (tanks[i] != NULL) {
+                window.draw(*tanks[i]);
+                window.draw(tanks[i]->gun);
+                
+                
+            }
+            
+        }
 
-				for (int j = i + 1; j<10; j++) {
+		
+		sf::Time elapsed = clock.restart();
+        
+		Draw_Tank(*tanks[0], elapsed, window);
+        
+        //坦克碰撞检查,消失
+        /*
+        for (int i=0; i < TANKS_NUMBER; i++) {
+            if (tanks[i] != NULL) {
+                for (int j = i+1; j < TANKS_NUMBER; j++) {
+                    tanks[i]->tank_collison(*tanks[j]);
+                }
+                
+            }
+            
+        }
+         */
+		
+        
+        for (int i=1; i < TANKS_NUMBER; i++) {
+            if (tanks[i] != NULL) {
+                tanks[i]->enemy_update(elapsed, window);
+            }
+            
+        }
+
+        
+	
+		//check_collsion
+		for (int i = 0; i< BULLETS_NUMBER; i++) {
+			if (bullets[i] != NULL) {
+//				障碍物与子弹碰撞检查
+                for (int j = 1; j <= shield.shield_position_array[0][0]; j++) {
+                    shield.check_collsion_with_bullet(*bullets[i],shield.a_position_x+shield.shield_position_array[j][0], shield.a_position_y+shield.shield_position_array[j][1]);
+                    
+                }
+                
+                ///坦克与子弹碰撞检验
+                for (int j=0; j < TANKS_NUMBER; j++) {
+                    if (tanks[j] != NULL) {
+                        tanks[j]->bullet_collision(*bullets[i]);
+                    }
+                }
+
+                //子弹与子弹碰撞检验
+				for (int j = i + 1; j< BULLETS_NUMBER; j++) {
 					if (bullets[j] != NULL) {
 						bullets[i]->bullet_collision_check(bullets[j]);
 					}
@@ -145,19 +202,34 @@ Game::Game() {
 			}
 		}
 
+// 障碍物与坦克碰撞
+        for (int i = 1; i <= shield.shield_position_array[0][0]; i++) {
+            for (int j=0; j < TANKS_NUMBER; j++) {
+                if (tanks[j] != NULL) {
+                      shield.check_collsion_with_tank(*tanks[j],shield.a_position_x+shield.shield_position_array[i][0], shield.a_position_y+shield.shield_position_array[i][1]);
+                }
+            }
+        }
+        
+                                                    
+          
+                    
 
-		shield_a.A_check_collsion_with_tank(*tanks[0]);
-		shield_a.A_check_collsion_with_tank(enemy_tank);
+		
+        
+        
+        
 		//check_exit
-
-		for (int i = 0; i<10; i++) {
+        
+        //子弹存在
+		for (int i = 0; i< BULLETS_NUMBER; i++) {
 			if (bullets[i] != NULL && bullets[i]->is_exist == false) {
 				delete bullets[i];
 				bullets[i] = NULL;
 			}
 		}
-
-		for (int i = 0; i<10; i++) {
+        
+		for (int i = 0; i< BULLETS_NUMBER; i++) {
 			if (bullets[i] && bullets[i]->is_exist == true)
 			{
 				bullets[i]->update(elapsed);
@@ -165,6 +237,13 @@ Game::Game() {
 
 			}
 		}
+        //坦克存在
+        for (int j=1; j < TANKS_NUMBER; j++) {
+            if (tanks[j] != NULL && tanks[j]->is_exist == false) {
+                delete tanks[j];
+                tanks[j] = NULL;
+            }
+        }
 
 
 		window.display();

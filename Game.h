@@ -11,12 +11,17 @@
 #define WIDTH 800
 #define HEIGHT 600
 
+#define BULLETS_NUMBER 10
+#define TANKS_NUMBER 4
+
 class Game {
 public:
-	Game();
+	Game(sf::RenderWindow &window);
 private:
-	Bullet *bullets[10] = { NULL };
-	Tank *tanks[5] = { NULL };
+	Bullet *bullets[BULLETS_NUMBER] = { NULL };
+    
+    //tank[0]为自己
+	Tank *tanks[TANKS_NUMBER] = { NULL };
 
 public:
 	void is_exit(sf::Event &event, sf::RenderWindow &window);
