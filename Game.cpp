@@ -1,5 +1,7 @@
 ﻿#include "Game.h"
 
+float score = 0;
+
 void Game::is_exit(sf::Event &event, sf::RenderWindow &window)
 {
 	//≈–∂œ «∑Òµ„°¡
@@ -21,10 +23,20 @@ Game::Game(sf::RenderWindow &window) {
 	sf::Clock clock;
 	sf::Clock enemy_fire_clock;
     sf::Clock create_enemy_clock;
+    
+    //score
+    sf::Font font;
+    if (!font.loadFromFile("/Users/XHZ/Library/Developer/Xcode/DerivedData/XML_Tank-endjjnmbmexpiehiwzrtpzwayevi/Build/Products/Release/XML_Tank.app/Contents/Resources/sansation.ttf")) {
+        return;
+    }
+    string score_text = "Score: ";
+    sf::Text text(score_text + "0" ,font,50);
+    text.setFillColor(sf::Color::Black);
 	
     
     //create tanks
     tanks[0] = new Tank();
+    tanks[0]->setPosition(375, 500);
     
       /*
 	Tank enemy_tank;
@@ -53,14 +65,13 @@ Game::Game(sf::RenderWindow &window) {
 //	sf::Event event;
 	while (window.isOpen())
 	{
+        //create enemy tanks
         for (int i=1; i < TANKS_NUMBER; i++) {
             if (tanks[i] == NULL && create_enemy_clock.getElapsedTime().asSeconds() > 10) {
                 create_enemy_clock.restart();
                 tanks[i] = new Tank();
-                tanks[i]->setPosition(150, 150);
-                tanks[i]->gun.setPosition(350, 450);
+                tanks[i]->setPosition(375, 100);
                 
-                printf("1");
             }
             
         }
@@ -152,6 +163,10 @@ Game::Game(sf::RenderWindow &window) {
         
 		Draw_Tank(*tanks[0], elapsed, window);
         
+        score = score+0.01;
+        text.setString(score_text + std::to_string((int)score) );
+        window.draw(text);
+        
         //坦克碰撞检查,消失
         /*
         for (int i=0; i < TANKS_NUMBER; i++) {
@@ -240,6 +255,7 @@ Game::Game(sf::RenderWindow &window) {
         //坦克存在
         for (int j=1; j < TANKS_NUMBER; j++) {
             if (tanks[j] != NULL && tanks[j]->is_exist == false) {
+                score += 20;
                 delete tanks[j];
                 tanks[j] = NULL;
             }
