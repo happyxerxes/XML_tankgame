@@ -26,7 +26,6 @@ int main() {
         
         game->delete_game();
         
-        printf("1");
         
         
         
