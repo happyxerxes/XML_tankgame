@@ -54,11 +54,11 @@ public:
 	void move_tank(sf::Event &event);
 	float enemy_fire_angle(sf::Vector2f vector);
 	Bullet enemy_fire2tank(Tank tank);
-	void enemy_move();
+	void enemy_move(int seed);
 	void enemy_update(sf::Time elapsed, sf::RenderWindow &window);
 	void update(sf::Time elapsed, sf::RenderWindow &window);
 	void bullet_collision(Bullet &bullet);
-	void tank_collison(Tank other_tank);
+	void tank_collison(Tank &other_tank);
 	float angle_of_gun(sf::RenderWindow &window);
 private:
 	float tank_speed = 200.f;
