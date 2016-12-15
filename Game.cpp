@@ -268,6 +268,14 @@ void Game::delete_game(){
 }
 
 void Game::start_game(sf::RenderWindow &window){
+    
+    sf::Texture mouse_texture;
+    sf::Sprite mouse_sprite;
+    mouse_texture.loadFromFile("mouse.jpg");
+    mouse_sprite.setTexture(mouse_texture);
+    mouse_sprite.setPosition(10, 10);
+    
+    
     sf::Event event;
     sf::Font font;
     if (!font.loadFromFile("sansation.ttf")) {
@@ -290,6 +298,7 @@ void Game::start_game(sf::RenderWindow &window){
     
     window.clear(sf::Color::White);
     
+    window.draw(mouse_sprite);
     window.draw(start_game_text);
     window.draw(current_score_text);
     window.draw(highest_score_text);
