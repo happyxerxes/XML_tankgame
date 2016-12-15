@@ -3,6 +3,7 @@
 #define game_hpp
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <stdio.h>
 #include "bullet.h"
 #include "tank.h"

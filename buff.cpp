@@ -20,6 +20,13 @@ Buff::Buff(int type) :RectangleShape(sf::Vector2f(BUFF_WIDTH, BUFF_HEIGHT)){
         this->setFillColor(sf::Color::Red);
         this->type = type;
     }
+    if (type == 3)
+    {
+        //this->buff_texture.loadFromFile("tank.png");
+        this->setFillColor(sf::Color::Yellow);
+        this->type = type;
+    }
+    
     this->setPosition(buff_position.x, buff_position.y);
     this->setOrigin(BUFF_WIDTH / 2, BUFF_HEIGHT / 2);
     
@@ -51,6 +58,15 @@ void Buff::clear_all_bullets(Bullet *bullets[], int bullets_number){
         }        
     }
 }
+
+void Buff::clear_all_tanks(Tank *tanks[], int tanks_number){
+    for (int i = 1; i < tanks_number; i++){
+        if (tanks[i] != NULL) {
+            tanks[i]->is_exist = false;
+        }
+    }
+}
+
 
 void Buff::add_mytank_life(int &life){
     life++;

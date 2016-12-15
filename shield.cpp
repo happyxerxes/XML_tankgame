@@ -36,7 +36,7 @@ Shield::Shield(unsigned int category) {
 	}
 }
 
-void Shield::check_collsion_with_bullet(Bullet &bullet, float position_x,float position_y) {
+void Shield::check_collsion_with_bullet(Bullet &bullet, float position_x,float position_y, sf::Sound &knocksound) {
 	sf::Vector2f centre_A, bullet_position;
 	centre_A.x = position_x + 20;
 	centre_A.y = position_y + 20;
@@ -49,14 +49,19 @@ void Shield::check_collsion_with_bullet(Bullet &bullet, float position_x,float p
 	if (x<35 && x>-35 && y<35 && y>-35) {
 		if (y>x && y>-x) {
 			bullet.reverse_dy_up();
+            knocksound.play();
 		}
         else if (y<x && y<-x) {
             bullet.reverse_dy_down();
+            knocksound.play();
         }
         else if (y<x && y>-x) {
             bullet.reverse_dx_right();
+            knocksound.play();
         }
-		else { bullet.reverse_dx_left(); }
+		else { bullet.reverse_dx_left();
+            knocksound.play();
+        }
 	}
 }
 void Shield::check_collsion_with_tank(Tank &tank, float position_x,float position_y) {

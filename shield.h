@@ -48,7 +48,7 @@ public:
 public:
     void create_map_A();
 	void setshape_B();
-    void check_collsion_with_bullet(Bullet &bullet, float position_x,float position_y);
+    void check_collsion_with_bullet(Bullet &bullet, float position_x,float position_y,sf::Sound &knocksound);
 	void check_collsion_with_tank(Tank &tank, float position_x,float position_y); 		
 
 

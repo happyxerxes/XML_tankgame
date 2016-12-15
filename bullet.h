@@ -2,6 +2,7 @@
 #define bullet_hpp
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <math.h>
 #define PI 3.1415926
 
@@ -49,7 +50,7 @@ public:
 	void vertical_collide();
 	void reset_collision();
 
-	void update(sf::Time elapsed);
+	void update(sf::Time elapsed, sf::Sound &knocksound);
 
 
 

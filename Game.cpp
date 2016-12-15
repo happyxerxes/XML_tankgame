@@ -27,7 +27,7 @@ void is_exit(sf::Event &event, sf::RenderWindow &window)
 }
 
 
-void mytank_move(sf::RenderWindow &window,sf::Event &event){
+void mytank_move(sf::RenderWindow &window,sf::Event &event, sf::Sound &shotsound){
     
     tanks[0]->move_tank_bymouse_check();
  
@@ -45,6 +45,7 @@ void mytank_move(sf::RenderWindow &window,sf::Event &event){
                 for (int i = 0; i < BULLETS_NUMBER; i++) {
                     if (bullets[i] == NULL) {
                         bullets[i] = new Bullet(tanks[0]->fire(window));
+                        shotsound.play();
                         break;
                     }
                 }
@@ -96,7 +97,7 @@ void create_and_draw_shields(Shield &shield, sf::Sprite &map_sprite, sf::RenderW
 
 
 
-void draw_tanks_and_bullets(sf::Clock &clock, sf::RenderWindow &window)
+void draw_tanks_and_bullets(sf::Clock &clock, sf::RenderWindow &window,sf::Sound &knocksound)
 {
     sf::Time elapsed = clock.restart();
 	tanks[0]->update(elapsed, window);
@@ -114,7 +115,7 @@ void draw_tanks_and_bullets(sf::Clock &clock, sf::RenderWindow &window)
     for (int i = 0; i< BULLETS_NUMBER; i++) {
         if (bullets[i] && bullets[i]->is_exist == true)
         {
-            bullets[i]->update(elapsed);
+            bullets[i]->update(elapsed,knocksound);
             window.draw(*bullets[i]);
             
         }
@@ -133,13 +134,13 @@ void add_and_draw_score(sf::RenderWindow &window, sf::Text &score_test, string &
     window.draw(score_test);
 }
 
-void all_check_collsion(Shield &shield){
+void all_check_collsion(Shield &shield,sf::Sound &boomsound,sf::Sound &knocksound){
     //check_collsion
     for (int i = 0; i< BULLETS_NUMBER; i++) {
         if (bullets[i] != NULL) {
             //障碍物与子弹碰撞检查
             for (int j = 1; j <= shield.shield_position_array[0][0]; j++) {
-                shield.check_collsion_with_bullet(*bullets[i],shield.a_position_x+shield.shield_position_array[j][0], shield.a_position_y+shield.shield_position_array[j][1]);
+                shield.check_collsion_with_bullet(*bullets[i],shield.a_position_x+shield.shield_position_array[j][0], shield.a_position_y+shield.shield_position_array[j][1],knocksound);
                 
             }
             
@@ -147,6 +148,7 @@ void all_check_collsion(Shield &shield){
             for (int j=0; j < TANKS_NUMBER; j++) {
                 if (tanks[j] != NULL) {
                     tanks[j]->bullet_collision(*bullets[i]);
+                    if (tanks[j]->is_exist == false){ boomsound.play(); }
                 }
             }
             
@@ -235,6 +237,7 @@ void create_enemy_tanks(sf::Clock &create_enemy_clock){
 
 
 void Game::delete_game(){
+    
     game_over = false;
     
     current_score = (int)score;
@@ -321,6 +324,40 @@ void Game::start_game(sf::RenderWindow &window){
 
 
 void Game::play_game(sf::RenderWindow &window){
+    
+    /////////////music load
+    sf::SoundBuffer shotbuffer;
+    shotbuffer.loadFromFile("shot.wav");
+    sf::Sound shotsound;
+    shotsound.setBuffer(shotbuffer);
+    
+    sf::SoundBuffer buffbuffer;
+    buffbuffer.loadFromFile("buff.wav");
+    sf::Sound buffsound;
+    buffsound.setBuffer(buffbuffer);
+    
+    sf::SoundBuffer knockbuffer;
+    knockbuffer.loadFromFile("knock.wav");
+    sf::Sound knocksound;
+    knocksound.setBuffer(knockbuffer);
+    
+    sf::SoundBuffer gameoverbuffer;
+    gameoverbuffer.loadFromFile("gameover.wav");
+    sf::Sound gameoversound;
+    gameoversound.setBuffer(gameoverbuffer);
+    
+    sf::SoundBuffer boombuffer;
+    boombuffer.loadFromFile("boom.wav");
+    sf::Sound boomsound;
+    boomsound.setBuffer(boombuffer);
+    
+    sf::SoundBuffer gamestartbuffer;
+    gamestartbuffer.loadFromFile("gamestart.wav");
+    sf::Sound gamestartsound;
+    gamestartsound.setBuffer(gamestartbuffer);
+    gamestartsound.play();
+    //////////////////////////////////////////////////
+    
     //	sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "TANK");
     sf::Clock clock;
     sf::Clock enemy_fire_clock;
@@ -375,7 +412,7 @@ void Game::play_game(sf::RenderWindow &window){
         create_enemy_tanks(create_enemy_clock);
         
         
-        mytank_move(window, event);
+        mytank_move(window, event,shotsound);
         
         enemy_tanks_move(enemy_fire_clock);
         
@@ -409,6 +446,7 @@ void Game::play_game(sf::RenderWindow &window){
                 
                 delete buff;
                 buff = NULL;
+                buffsound.play();
             }
             
             if (buff_type == 2){
@@ -418,6 +456,15 @@ void Game::play_game(sf::RenderWindow &window){
                 
                 delete buff;
                 buff = NULL;
+                buffsound.play();
+            }
+            
+            if (buff_type == 3){
+                buff->clear_all_tanks(tanks, TANKS_NUMBER);
+                delete buff;
+                buff = NULL;
+                buffsound.play();
+                
             }
             
         }
@@ -434,14 +481,14 @@ void Game::play_game(sf::RenderWindow &window){
         create_and_draw_shields(shield, map_sprite, window);
         
         
-        draw_tanks_and_bullets(clock, window);
+        draw_tanks_and_bullets(clock, window,knocksound);
         
         
         add_and_draw_score(window, score_text, score_str);
         add_and_draw_life(window, life_text, life_str);
         
         
-        all_check_collsion(shield);
+        all_check_collsion(shield,boomsound,knocksound);
         
         
         all_check_exit();
@@ -449,7 +496,10 @@ void Game::play_game(sf::RenderWindow &window){
        
         
         window.display();
+        
     }
+    gameoversound.play();
+    
 }
 
 

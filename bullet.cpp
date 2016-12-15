@@ -32,7 +32,7 @@ void Bullet::reset_collision() {
 	vertical_collsion = false;
 }
 
-void Bullet::update(sf::Time elapsed)
+void Bullet::update(sf::Time elapsed, sf::Sound &knocksound)
 {
     //  float elapsed_time = elapsed.asSeconds();
     //update position
@@ -50,29 +50,29 @@ void Bullet::update(sf::Time elapsed)
     if (next_position.x <= left_side || next_position.x >= right_side){
         bullet_v.x = -bullet_v.x;
         dx = -dx;
+        knocksound.play();
     }
     if (next_position.y >= down_side || next_position.y <= up_side){
         bullet_v.y = -bullet_v.y;
         dy = -dy;
+        knocksound.play();
     }
     
     
     if (horizontal_collision)
     {
         bullet_v.y = -bullet_v.y;
+        knocksound.play();
     }
     if (vertical_collsion)
     {
         bullet_v.x = -bullet_v.x;
+        knocksound.play();
     }
     
     //collsion_check(image);
     
     this->move(dx, dy);
-    
-    
-    
-    
     
 }
 
