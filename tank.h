@@ -10,6 +10,7 @@
 #define TO_RADIAN * 3.1415926f / 180
 #define ERROR 0;
 #define OK 1;
+
 using namespace std;
 class Tank : public sf::RectangleShape
 {
@@ -17,8 +18,8 @@ public:
 	Tank() :RectangleShape(sf::Vector2f(TANK_WIDTH, TANK_HEIGHT))
 	{
 
-		this->tank_texture.loadFromFile( "/Users/XHZ/Library/Developer/Xcode/DerivedData/XML_Tank-endjjnmbmexpiehiwzrtpzwayevi/Build/Products/Release/XML_Tank.app/Contents/Resources/tank.png");
-		this->gun_texture.loadFromFile("/Users/XHZ/Library/Developer/Xcode/DerivedData/XML_Tank-endjjnmbmexpiehiwzrtpzwayevi/Build/Products/Release/XML_Tank.app/Contents/Resources/gun.png");
+		this->tank_texture.loadFromFile("tank.png");
+		this->gun_texture.loadFromFile("gun.png");
 		this->setPosition(50, 50);
 		this->setOrigin(TANK_WIDTH / 2, TANK_HEIGHT / 2);
 		this->velocity = TANK_VELOCITY;
@@ -52,6 +53,8 @@ public:
 	float previous_rotation;
 	Bullet fire(sf::RenderWindow &window);
 	void move_tank(sf::Event &event);
+    void move_tank_bymouse(sf::Event &event, sf::RenderWindow &window);
+    void move_tank_bymouse_check();
 	float enemy_fire_angle(sf::Vector2f vector);
 	Bullet enemy_fire2tank(Tank tank);
 	void enemy_move(int seed);
@@ -62,6 +65,7 @@ public:
 	float angle_of_gun(sf::RenderWindow &window);
 private:
 	float tank_speed = 200.f;
+    float rotate_speed = 300;
 	bool forwarding = false;
 	bool backing = false;
 	bool clockwising = false;
@@ -73,6 +77,8 @@ private:
 	sf::Vector2f r3;
 	sf::Texture gun_texture;
 	sf::Texture tank_texture;
+    sf::Vector2f mousePosition = this->getPosition();
+    bool head_move = true;
 public:
 	bool is_exist = true;
 	sf::Sprite gun;

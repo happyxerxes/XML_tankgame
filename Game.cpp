@@ -28,11 +28,15 @@ void is_exit(sf::Event &event, sf::RenderWindow &window)
 
 
 void mytank_move(sf::RenderWindow &window,sf::Event &event){
+    
+    tanks[0]->move_tank_bymouse_check();
+ 
     while (window.pollEvent(event))
     {
         is_exit(event, window);
         
-        tanks[0]->move_tank(event);
+       //tanks[0]->move_tank(event);
+       tanks[0]->move_tank_bymouse(event, window);
         
         if (event.type == sf::Event::MouseButtonPressed)
         {
@@ -103,6 +107,7 @@ void draw_tanks_and_bullets(sf::Clock &clock, sf::RenderWindow &window)
         if (tanks[i] != NULL) {
             tanks[i]->enemy_update(elapsed, window);
             window.draw(*tanks[i]);
+            window.draw(tanks[i]->gun);
         }
     }
     
@@ -262,7 +267,7 @@ void Game::delete_game(){
 void Game::start_game(sf::RenderWindow &window){
     sf::Event event;
     sf::Font font;
-    if (!font.loadFromFile("/Users/XHZ/Library/Developer/Xcode/DerivedData/XML_Tank-endjjnmbmexpiehiwzrtpzwayevi/Build/Products/Release/XML_Tank.app/Contents/Resources/sansation.ttf")) {
+    if (!font.loadFromFile("sansation.ttf")) {
         return;
     }
     string current_score_str = "Score: ";
@@ -324,7 +329,7 @@ void Game::play_game(sf::RenderWindow &window){
     
     //score
     sf::Font font;
-    if (!font.loadFromFile("/Users/XHZ/Library/Developer/Xcode/DerivedData/XML_Tank-endjjnmbmexpiehiwzrtpzwayevi/Build/Products/Release/XML_Tank.app/Contents/Resources/sansation.ttf")) {
+    if (!font.loadFromFile("sansation.ttf")) {
         return;
     }
     string score_str = "Score: ";
@@ -353,7 +358,7 @@ void Game::play_game(sf::RenderWindow &window){
     
     sf::Texture shield_texture;
     
-    if (!shield_texture.loadFromFile("/Users/XHZ/Library/Developer/Xcode/DerivedData/XML_Tank-endjjnmbmexpiehiwzrtpzwayevi/Build/Products/Release/XML_Tank.app/Contents/Resources/shield.jpg")) {
+    if (!shield_texture.loadFromFile("shield.jpg")) {
         return;
     }
     
@@ -441,6 +446,7 @@ void Game::play_game(sf::RenderWindow &window){
         
         all_check_exit();
         
+       
         
         window.display();
     }
