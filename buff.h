@@ -4,7 +4,7 @@
 #define BUFF_HEIGHT 25
 #define BUFF_WIDTH 25
 
-#define BUFF_TANK_DISTANCE 40
+#define BUFF_TANK_DISTANCE 28
 #define RAND_MAX_X  700
 #define RAND_MIN_X 50
 #define RAND_MAX_Y  600
