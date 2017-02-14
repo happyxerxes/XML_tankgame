@@ -7,7 +7,8 @@ int current_score = 0;
 int highest_score = 0;
 int mytank_life = 1;
 
-int goal[3]={200,500,1200};
+//int goal[3]={200,500,1200};
+int goal[MAX_LEVEL]={100,200,400,700,1100,1600,2200,2900,3700,4500};
 int enemy_create_speed; //3
 int enemy_fire_distance;  //250
 int enemy_fire_gap;   //2
@@ -444,7 +445,12 @@ void Game::delete_game() {
     }
 }
 
-void Game::next_game(sf::RenderWindow &window, int level) {
+void Game::next_game(sf::RenderWindow &window, int level, bool score_flag) {
+    
+    if (score_flag == true) {
+        score = previous_score;
+    }
+    previous_score = score;
     
     game_over = false;
     
@@ -628,6 +634,7 @@ void Game::start_game(sf::RenderWindow &window) {
 
 
 bool Game::play_game(sf::RenderWindow &window,int level) {
+
     
     //difficulty
     if (level == 0) {
@@ -638,11 +645,53 @@ bool Game::play_game(sf::RenderWindow &window,int level) {
     }
     else if(level == 1){
         enemy_create_speed = 2; //3
-        enemy_fire_distance = 500;  //250
+        enemy_fire_distance = 260;  //250
         enemy_fire_gap = 2;   //2
         
     }
     else if(level == 2){
+        enemy_create_speed = 2; //3
+        enemy_fire_distance = 270;  //250
+        enemy_fire_gap = 2;   //2
+       
+    }
+    else if(level == 3){
+        enemy_create_speed = 2; //3
+        enemy_fire_distance = 280;  //250
+        enemy_fire_gap = 2;   //2
+        
+    }
+    else if(level == 4){
+        enemy_create_speed = 2; //3
+        enemy_fire_distance = 290;  //250
+        enemy_fire_gap = 2;   //2
+       
+    }
+    else if(level == 5){
+        enemy_create_speed = 2; //3
+        enemy_fire_distance = 300;  //250
+        enemy_fire_gap = 2;   //2
+        
+    }
+    else if(level == 6){
+        enemy_create_speed = 2; //3
+        enemy_fire_distance = 350;  //250
+        enemy_fire_gap = 2;   //2
+       
+    }
+    else if(level == 7){
+        enemy_create_speed = 2; //3
+        enemy_fire_distance = 400;  //250
+        enemy_fire_gap = 2;   //2
+       
+    }
+    else if(level == 8){
+        enemy_create_speed = 2; //3
+        enemy_fire_distance = 500;  //250
+        enemy_fire_gap = 2;   //2
+        
+    }
+    else if(level == 9){
         enemy_create_speed = 2; //3
         enemy_fire_distance = 1000;  //250
         enemy_fire_gap = 1;   //2
@@ -790,7 +839,116 @@ bool Game::play_game(sf::RenderWindow &window,int level) {
 
 
 
-
+void Game::pass_game(sf::RenderWindow &window) {
+    
+    game_over = false;
+    
+    current_score = (int)score;
+    if (current_score > highest_score) {
+        highest_score = current_score;
+        ofstream highest_score_txt("./resources/highest_score.txt");
+        if (highest_score_txt.is_open())
+        {
+            highest_score_txt << std::to_string(highest_score);
+            highest_score_txt.close();
+        }
+    }
+    
+    //score = 0;
+    
+    for (int i = 0; i < TANKS_NUMBER; i++) {
+        if (tanks[i] != NULL) {
+            delete tanks[i];
+        }
+        tanks[i] = NULL;
+    }
+    
+    for (int i = 0; i < BULLETS_NUMBER; i++) {
+        if (bullets[i] != NULL) {
+            delete bullets[i];
+        }
+        bullets[i] = NULL;
+    }
+    for (int i = 0; i < MY_BULLETS_NUMBER; i++) {
+        if (my_bullets[i] != NULL) {
+            delete my_bullets[i];
+        }
+        my_bullets[i] = NULL;
+    }
+    
+    
+    if (buff != NULL) {
+        delete buff;
+        buff = NULL;
+    }
+    
+    sf::Texture mouse_texture;
+    sf::Sprite mouse_sprite;
+    mouse_texture.loadFromFile("./resources/introduction.png");
+    mouse_sprite.setTexture(mouse_texture);
+    mouse_sprite.setPosition(10, 10);
+    
+    
+    sf::Event event;
+    sf::Font font;
+    if (!font.loadFromFile("./resources/sansation.ttf")) {
+        return;
+    }
+    string current_score_str = "Score: ";
+    string highest_score_str = "Highest Score: ";
+    ifstream highest_score_txt("./resources/highest_score.txt");
+    if (highest_score_txt.is_open())
+    {
+        char buffer[10];
+        highest_score_txt.getline(buffer, 10);
+        highest_score = atoi(buffer);
+    }
+    string start_game_str = "Congratulations !";
+    sf::Text current_score_text(current_score_str + std::to_string(current_score), font, 50);
+    sf::Text highest_score_text(highest_score_str + std::to_string(highest_score), font, 50);
+    sf::Text start_game_text(start_game_str, font, 60);
+    
+    current_score_text.setPosition(WIDTH / 2 - 200, HEIGHT / 2 - 100);
+    highest_score_text.setPosition(WIDTH / 2 - 200, HEIGHT / 2 - 50);
+    start_game_text.setPosition(WIDTH / 2 - 250, HEIGHT / 2 + 100);
+    
+    start_game_text.setFillColor(sf::Color::Black);
+    highest_score_text.setFillColor(sf::Color::Black);
+    current_score_text.setFillColor(sf::Color::Black);
+    
+    window.clear(sf::Color::White);
+    
+    window.draw(mouse_sprite);
+    window.draw(start_game_text);
+    window.draw(current_score_text);
+    window.draw(highest_score_text);
+    
+    window.display();
+    
+    bool flag = true;
+    
+    while (window.isOpen() && flag) {
+        while (window.pollEvent(event))
+        {
+            bool close = (event.type == sf::Event::Closed);
+            //≈–∂œ «∑Ò∞¥ESC
+            bool escape = (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape);
+            if (close || escape)
+                window.close();
+            
+            
+            if (event.type == sf::Event::MouseButtonPressed)
+            {
+                if (event.mouseButton.button == sf::Mouse::Left)
+                {
+                    flag = false;
+                    break;
+                }
+            }
+        }
+        
+    }
+}
 
 
 Game::Game() {
