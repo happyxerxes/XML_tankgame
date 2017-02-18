@@ -268,7 +268,8 @@ void Shield::check_collsion_with_tank(Tank &tank, float position_x,float positio
 		float k = (right_up_point.y - left_up_point.y) / (right_up_point.x - left_up_point.x);
 		float dx = (right_up_point.x - left_up_point.x) / 9;
 		//        float x,y;
-
+        
+        int distance_limit = 26;
 
 		for (int i = 0; i<10; i++) {
 			x = left_up_point.x + dx*i;
@@ -277,12 +278,57 @@ void Shield::check_collsion_with_tank(Tank &tank, float position_x,float positio
 			x = x - centre_A.x;
 			y = y - centre_A.y;
 
-			if (x<27 && x>-27 && y<27 && y>-27) {
+			if (x<distance_limit && x>-distance_limit && y<distance_limit && y>-distance_limit) {
 				tank.setPosition(tank.previous_position.x, tank.previous_position.y);
-				tank.setRotation(tank.previous_rotation);
+			//	tank.setRotation(tank.previous_rotation);
+                k = (right_up_point.y - left_up_point.y) / (right_up_point.x - left_up_point.x);
+                dx = (right_up_point.x - left_up_point.x) / 9;
+                for (int i = 0; i<10; i++) {
+                    x = left_up_point.x + dx*i;
+                    y = k*(x - left_up_point.x) + left_up_point.y;
+                    
+                    x = x - centre_A.x;
+                    y = y - centre_A.y;
+                    if (x<distance_limit && x>-distance_limit && y<distance_limit && y>-distance_limit){
+                        tank.setRotation(tank.previous_rotation);
+                        break;
+                    }
+                }
+                k = (right_down_point.y - left_down_point.y) / (right_down_point.x - left_down_point.x);
+                dx = (right_down_point.x - left_down_point.x) / 9;
+                x = left_down_point.x + dx*i;
+                y = k*(x - left_down_point.x) + left_down_point.y;
+                
+                x = x - centre_A.x;
+                y = y - centre_A.y;
+                for (int i = 0; i<10; i++) {
+                    x = left_up_point.x + dx*i;
+                    y = k*(x - left_up_point.x) + left_up_point.y;
+                    
+                    x = x - centre_A.x;
+                    y = y - centre_A.y;
+                    if (x<distance_limit && x>-distance_limit && y<distance_limit && y>-distance_limit){
+                        tank.setRotation(tank.previous_rotation);
+                        break;
+                    }
+                }
 				break;
 			}
 
+            /*
+            if (x<27 && x>-27 && y<27 && y>-27) {
+                if (x>26 || x < -26) {
+                    tank.setPosition(tank.previous_position.x, tank_position.y);
+
+                }
+                else if (y>26 || y<-26) {
+                    tank.setPosition(tank_position.x, tank.previous_position.y);
+                }
+                
+                //tank.setRotation(tank.previous_rotation);
+                break;
+            }
+             */
 		}
 
 
@@ -300,12 +346,42 @@ void Shield::check_collsion_with_tank(Tank &tank, float position_x,float positio
 			x = x - centre_A.x;
 			y = y - centre_A.y;
 
-			if (x<27 && x>-27 && y<27 && y>-27) {
-				tank.setPosition(tank.previous_position.x, tank.previous_position.y);
-				tank.setRotation(tank.previous_rotation);
-				break;
-			}
-
+            if (x<distance_limit && x>-distance_limit && y<distance_limit && y>-distance_limit) {
+                tank.setPosition(tank.previous_position.x, tank.previous_position.y);
+                //	tank.setRotation(tank.previous_rotation);
+                k = (right_up_point.y - left_up_point.y) / (right_up_point.x - left_up_point.x);
+                dx = (right_up_point.x - left_up_point.x) / 9;
+                for (int i = 0; i<10; i++) {
+                    x = left_up_point.x + dx*i;
+                    y = k*(x - left_up_point.x) + left_up_point.y;
+                    
+                    x = x - centre_A.x;
+                    y = y - centre_A.y;
+                    if (x<distance_limit && x>-distance_limit && y<distance_limit && y>-distance_limit){
+                        tank.setRotation(tank.previous_rotation);
+                        break;
+                    }
+                }
+                k = (right_down_point.y - left_down_point.y) / (right_down_point.x - left_down_point.x);
+                dx = (right_down_point.x - left_down_point.x) / 9;
+                x = left_down_point.x + dx*i;
+                y = k*(x - left_down_point.x) + left_down_point.y;
+                
+                x = x - centre_A.x;
+                y = y - centre_A.y;
+                for (int i = 0; i<10; i++) {
+                    x = left_up_point.x + dx*i;
+                    y = k*(x - left_up_point.x) + left_up_point.y;
+                    
+                    x = x - centre_A.x;
+                    y = y - centre_A.y;
+                    if (x<distance_limit && x>-distance_limit && y<distance_limit && y>-distance_limit){
+                        tank.setRotation(tank.previous_rotation);
+                        break;
+                    }
+                }
+                break;
+            }
 		}
 
 

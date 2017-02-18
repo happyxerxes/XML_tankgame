@@ -114,9 +114,10 @@ void create_and_draw_shields(Shield &shield, sf::Sprite &map_sprite, sf::RenderW
 
 
 
-void draw_tanks_bullets_and_buff(sf::Clock &clock, sf::RenderWindow &window, sf::Sound &knocksound)
+void draw_tanks_bullets_and_buff_and_background(sf::Clock &clock, sf::RenderWindow &window, sf::Sound &knocksound, sf::Sprite background_sprite)
 {
     window.clear(sf::Color(225, 225, 225));
+    window.draw(background_sprite);
     
     if (buff != NULL) {
         window.draw(*buff);
@@ -753,7 +754,29 @@ bool Game::play_game(sf::RenderWindow &window,int level) {
     life_text.setPosition(0, 50);
     
     
+    sf::Texture background_texture;
+    switch (level) {
+        case 0:
+        case 1:
+        case 2:
+            background_texture.loadFromFile("./resources/background1.jpg");
+            break;
+        case 3:
+        case 4:
+        case 5:
+            background_texture.loadFromFile("./resources/background2.jpg");
+            break;
+        case 6:
+        case 7:
+        case 8:
+            background_texture.loadFromFile("./resources/background3.jpg");
+            break;
+        default:
+            break;
+    }
+   
     
+    sf::Sprite background_sprite(background_texture);
     
     //create my tank
     tanks[0] = new Tank();
@@ -763,6 +786,7 @@ bool Game::play_game(sf::RenderWindow &window,int level) {
     my_gun_texture.loadFromFile("./resources/my_gun.png");
     tanks[0]->setTexture(&my_tank_texture);
     tanks[0]->gun.setTexture(my_gun_texture);
+    
     
     
     /*
@@ -789,6 +813,7 @@ bool Game::play_game(sf::RenderWindow &window,int level) {
     
     while (window.isOpen() && (!game_over) && ((int)score < goal[level]))
     {
+       
         
         create_enemy_tanks(create_enemy_clock,shield);
         
@@ -805,7 +830,7 @@ bool Game::play_game(sf::RenderWindow &window,int level) {
         
         
         
-        draw_tanks_bullets_and_buff(clock, window, knocksound);
+        draw_tanks_bullets_and_buff_and_background(clock, window, knocksound,background_sprite);
         
         create_and_draw_shields(shield, map_sprite, window);
         
@@ -818,7 +843,7 @@ bool Game::play_game(sf::RenderWindow &window,int level) {
         
         
         all_check_exit();
-        
+       
         
         
         window.display();
