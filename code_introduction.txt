@@ -1,0 +1,187 @@
+代码说明文档
+
+一、整体概述：
+运行环境：
+Windows版：Windows 7/8/10
+Mac版：macOS
+
+主要功能：
+一款坦克射击类单机游戏
+
+二、代码部分：
+文件：
+Game.cpp、Game.h
+tank.cpp、tank.h
+bullet.cpp、bullet.h
+shield.cpp、shield.h
+buff.cpp、buff.h
+main.cpp
+
+1、main.cpp（程序入口）
+作用是创造Game类的实体game，调用game->start_game、game->play_game、game->next_game控制游戏开始，游戏过程与下一局开始。
+
+2、Game类：
+最重要的类，负责控制游戏进程
+被main函数直接调用
+
+包含的头文件：
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <stdio.h>
+#include <fstream>
+#include "bullet.h"
+#include "tank.h"
+#include "shield.h"
+#include "buff.h"
+
+成员方法：
+bool play_game(sf::RenderWindow &window,int level);
+控制游戏过程，读入
+传入当前窗口、关卡数，返回bool值，若为true则表示通关
+void start_game(sf::RenderWindow &window);
+开始游戏，显示开始游戏的界面，显示最高分、下一关通关分数以及当前分数，点击开始后进入游戏
+传入当前窗口
+void delete_game();
+一局游戏结束后将游戏中的变量清零
+void next_game(sf::RenderWindow &window,int level,bool score_flag);
+下一局游戏，显示开始游戏的界面，显示最高分、下一关通关分数以及当前分数，点击开始后进入游戏
+传入当前窗口、关卡数、分数flag
+void pass_game(sf::RenderWindow &window);
+通关显示画面
+传入当前窗口
+
+私有变量：
+bool game_over = false; 判断游戏是否结束
+float score = 0;
+int current_score = 0;
+int highest_score = 0;  计分相关的变量
+int mytank_life = 1;  坦克生命值
+int goal[MAX_LEVEL]={100,200,400,700,1100,1600,2200,2900,3700,4500};  每一关的目标分数
+int enemy_create_speed; //3   敌方坦克生成速度
+int enemy_fire_distance;  //250  敌方坦克开火距离
+int enemy_fire_gap;   //2   敌方坦克开火间隔时间
+Bullet *bullets[BULLETS_NUMBER];   敌方子弹实体
+Bullet *my_bullets[MY_BULLETS_NUMBER];   己方子弹实体   
+Tank *tanks[TANKS_NUMBER];  坦克实体，tank[0]为自己
+Buff *buff = NULL;  buff实体
+
+3、tank类：
+与坦克相关的类，负责生成坦克，控制坦克移动，发射子弹，检验坦克与坦克、坦克与子弹的碰撞
+被Game、buff及shield类调用
+
+包含的头文件：
+#include <SFML/Graphics.hpp>
+#include "bullet.h"
+#include <iostream>
+#include <time.h>
+
+主要成员方法（被Game类调用）：
+void move_tank_bymouse(sf::Event &event, sf::RenderWindow &window);
+通过鼠标控制己方坦克移动
+传入鼠标事件，当前窗口
+Bullet fire(sf::RenderWindow &window);
+己方坦克开火
+传入当前窗口，返回一个bullet实体
+void enemy_move(int seed);
+敌方坦克的AI移动
+传入种子值
+Bullet enemy_fire2tank(Tank tank);
+敌方坦克的AI开火
+传入坦克实体
+void bullet_collision(Bullet &bullet);
+坦克与子弹的碰撞检验
+传入子弹
+void tank_collison(Tank &other_tank);
+坦克与坦克的碰撞检验
+传入第二辆坦克
+
+主要私有变量：
+float tank_speed = 200.f;   坦克速度
+float rotate_speed = 500;   坦克旋转速度
+bool forwarding = false;    坦克行动方向
+bool backing = false;    坦克行动方向
+bool clockwising = false;     坦克行动方向
+bool anti_clockwising = false;   坦克行动方向
+sf::Vector2f velocity;     坦克速度矢量
+sf::Vector2f mousePosition = this->getPosition();  鼠标点击位置
+
+公有变量：
+ bool is_exist = true;   坦克是否存在
+
+ 3、bullet类：
+与子弹相关的类，负责生成子弹，子弹移动，发射子弹，检验坦子弹与子弹的碰撞
+被Game、tank、buff及shield类调用
+
+包含的头文件：
+#include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
+#include <math.h>
+
+主要成员方法（被Game类调用）：
+（构造函数）Bullet(sf::Vector2f position, float angle)；
+负责生成子弹位置以及子弹初速度
+传入子弹生成位置以及子弹初速度方向
+void bullet_collision_check(Bullet *bullet);
+负责检验子弹与子弹的碰撞
+传入另一个子弹实体
+
+主要私有变量：
+sf::Vector2f bullet_v; 子弹速度方向
+float dx, dy; 子弹速度方向分量
+sf::Vector2f current_position; 子弹当前位置
+
+公有变量：
+bool is_exist = true;   子弹是否存在
+
+4、shield类：
+与障碍物相关的类，负责每关随机生成障碍物，检验坦克生成位置，检验坦子弹与障碍物、坦克与障碍物的碰撞
+被Game类调用
+
+包含的头文件：
+#include <SFML/Graphics.hpp>
+#include "bullet.h"
+#include "tank.h"
+#include <math.h>
+
+主要成员方法（被Game类调用）：
+（构造函数）Shield(int category);
+随机创造不同的地图
+传入地图种类值（种类值暂时无用）
+void check_collsion_with_bullet(Bullet &bullet, float position_x, float position_y, sf::Sound &knocksound);
+检验子弹与障碍物的碰撞
+传入子弹实体、子弹速度分量、碰撞音效
+void check_collsion_with_tank(Tank &tank, float position_x, float position_y);
+检测障碍物与坦克碰撞
+传入坦克实体、坦克当前位置分量
+bool check_creat_tank(Tank &tank, float position_x,float position_y);
+检测创造坦克地点
+传入坦克实体，创造地的位置分量，传回bool型变量，若为false则该位置被障碍物遮挡
+
+主要公有变量：
+float level_shield[MAX+1][2]; 地图数组，储存障碍物位置
+float *shield_position_array;  地图数组指针
+
+5、buff类
+与buff相关的类，负责每关随机生成不同效果的buff，检验坦克是否吃到buff
+被Game类调用
+
+主要成员方法（被Game类调用）：
+（构造函数）Buff(int type);
+生成一定效果的buff
+传入一个type数，1、2、3分别代表三种不同buff
+int tank_buff_collision(Tank *tank);
+检验坦克是否吃到buff
+传入坦克实体
+void clear_all_bullets(Bullet *bullets[], int bullets_number);
+buff种类一：清空所有子弹
+传入所有子弹数组和子弹数目
+void add_mytank_life(int &life);
+buff种类二：增加生命值
+传入生命值
+void clear_all_tanks(Tank *tanks[], int tanks_number);
+buff种类三：清空所有敌方坦克
+传入所有坦克数组和坦克数目
+
+主要公有变量：
+bool is_exist = 0; 该buff是否存在
+int type = 0;	buff类型
